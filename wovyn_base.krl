@@ -47,7 +47,7 @@ A base ruleset for wovyn
 		}
 		if tempF > temperature_threshold then send_directive("high temp breached", {"temp" : tempF})
 		fired {
-			raise wovyn event "threshold_violation" attributes {}
+			raise wovyn event "threshold_violation" attributes {"temperature": temperatureA, "timestamp": event:attrs{"timestamp"}}
 		}
 	}
 
