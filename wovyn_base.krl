@@ -5,6 +5,7 @@ ruleset wovyn_base {
 A base ruleset for wovyn
 >>
     author "Jack Chen"
+    use module sensor_profile alias profile
     use module twilio_api_ruleset alias sdk
       with
         account_sid = meta:rulesetConfig{"account_sid"}
@@ -12,8 +13,8 @@ A base ruleset for wovyn
   }
    
 	global {
-		temperature_threshold = 160
-		violation_number = 19255480666
+		temperature_threshold = profile:get_temperature_threshold()
+		violation_number = profile:get_to_number()
 		from_number = 18304901337
 	}
 
@@ -45,7 +46,7 @@ A base ruleset for wovyn
 			tempF = tempB{"temperatureF"}.klog("tempF")
 
 		}
-		if tempF > temperature_threshold then send_directive("high temp breached", {"temp" : tempF})
+		if tempF > profile:get_temperature_threshold().klog("Temp Thresh") then send_directive("high temp breached", {"temp" : tempF})
 		fired {
 			raise wovyn event "threshold_violation" attributes {"temperature": temperatureA, "timestamp": event:attrs{"timestamp"}}
 		}
@@ -55,7 +56,7 @@ A base ruleset for wovyn
 		select when wovyn threshold_violation
 
 		every{
-        		sdk:sendMessage(violation_number, from_number, "temperature threshold has been breached") setting(response)
+        		sdk:sendMessage(profile:get_to_number(), from_number, "temperature threshold has been breached") setting(response)
 			send_directive("message sent",{"response":response})
 		}
 	}
