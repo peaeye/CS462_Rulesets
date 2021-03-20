@@ -27,6 +27,7 @@ A sensor profile
 
 	rule initialize_ruleset {
 		select when wrangler ruleset_installed
+			where event:attr("rids") >< meta:rid
 		pre {
 			
 		}

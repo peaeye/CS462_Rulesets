@@ -1,16 +1,18 @@
 ruleset wovyn_base {
-  meta {
-    name "Wovyn Base"
-    description <<
+ 	meta {
+    	name "Wovyn Base"
+    	description <<
 A base ruleset for wovyn
->>
-    author "Jack Chen"
-    use module sensor_profile alias profile
-    use module twilio_api_ruleset alias sdk
-      with
-        account_sid = meta:rulesetConfig{"account_sid"}
-        auth_token = meta:rulesetConfig{"auth_token"}
-  }
+		>>
+    	author "Jack Chen"
+        use module io.picolabs.subscription alias subs
+    	use module sensor_profile alias profile
+		use module relate_parent_child alias relation
+    	use module twilio_api_ruleset alias sdk
+      		with
+        		account_sid = meta:rulesetConfig{"account_sid"}
+        		auth_token = meta:rulesetConfig{"auth_token"}
+	}
    
 	global {
 		temperature_threshold = profile:get_temperature_threshold()
@@ -55,9 +57,21 @@ A base ruleset for wovyn
 	rule threshold_notification {
 		select when wovyn threshold_violation
 
-		every{
-        		sdk:sendMessage(profile:get_to_number(), from_number, "temperature threshold has been breached") setting(response)
-			send_directive("message sent",{"response":response})
+		pre {
+			temp = event:attrs{"temperature"}
+		}
+
+		every {
+        	//sdk:sendMessage(profile:get_to_number(), from_number, "temperature threshold has been breached") setting(response)
+			//send_directive("message sent",{"response":response})
+			event:send({"eci":relation:getSubscriptionTx().klog("subsTX:"),
+				"domain":"sensor", "name":"threshold_violation",
+				"attrs":{
+					"wellKnown_Tx":subs:wellKnown_Rx(){"id"},
+					"temperature":temp,
+					"name":ent:name
+				}
+			})
 		}
 	}
 }
