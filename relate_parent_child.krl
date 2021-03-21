@@ -7,7 +7,7 @@ A ruleset to establish a parent child relationship
 		author "Jack Chen"
 		use module io.picolabs.wrangler alias wrangler
         use module io.picolabs.subscription alias subs
-        provides getSubscriptionTx
+        provides getSubscriptionTx, getParentECI
     }
   
    
@@ -20,6 +20,9 @@ A ruleset to establish a parent child relationship
         queryPolicy = {
             "allow": [ { "rid": meta:rid, "name": "*" } ],
             "deny": []
+        }
+        getParentECI = function() {
+            ent:parent_eci
         }
         getSubscriptionTx = function() {
             ent:subscriptionTx
@@ -60,11 +63,11 @@ A ruleset to establish a parent child relationship
     rule make_a_subscription {
         select when sensor new_subscription_request
         event:send({"eci":ent:parent_eci,
-            "domain":"wrangler", "name":"subscription",
-            "attrs": {
-                "wellKnown_Tx":subs:wellKnown_Rx(){"id"},
-                "Rx_role":"sensor_collection", "Tx_role":"sensor",
-                "name":ent:name+"-sensor", "channel_type":"subscription"
+                    "domain":"wrangler", "name":"subscription",
+                    "attrs": {
+                        "wellKnown_Tx":subs:wellKnown_Rx(){"id"},
+                        "Rx_role":"sensor_collection", "Tx_role":"sensor",
+                        "name":ent:name+"-sensor", "channel_type":"subscription"
             }
         })
     }
