@@ -18,9 +18,16 @@ A ruleset to manage the creation and set up of new sensors
   
    
 	global {
+		/*****************************************************
+        *  GLOBAL VARIABLES
+        */
 		account_sid = meta:rulesetConfig{"account_sid"}
 		auth_token = meta:rulesetConfig{"auth_token"}
 		from_number = 18304901337
+		
+        /*****************************************************
+        *  FUNCTIONS
+        */
 		showChildren = function() {
 			ent:sensors
 		}
@@ -258,11 +265,6 @@ A ruleset to manage the creation and set up of new sensors
 			new_rcn = genCorrelationNumber()
 			rcn = event:attrs{"report_correlation_number"}.klog("report corrl number:") || new_rcn.klog("new_rcn:")
 			num_sensors = getSensorsSubs().length().klog("num_sensors length:")
-			/*report_data = {"period": period,
-					"start": start,
-					"end": end,
-					"timezone": tz}
-					*/
 			augmented_attrs = event:attrs
 								.put(["report_correlation_number"], rcn)
 		}
@@ -272,7 +274,6 @@ A ruleset to manage the creation and set up of new sensors
 				attributes augmented_attrs
 			ent:sensor_reports{[rcn, "temperature_sensors"]} := num_sensors
 			ent:sensor_reports{[rcn, "responding"]} := 0
-			//ent:report_data{rcn} := report_data
 			schedule explicit event "periodic_report_timer_expired"
 				at time:add(time:now(),{"minutes" : 2}) 
 				attributes {"report_correlation_number": rcn}

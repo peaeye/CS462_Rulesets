@@ -14,23 +14,23 @@ Application that uses the Twilio API
 
   global {
   	getMessages = function(to, from, pageSize) {
-		sdk:messages(to, from, pageSize)
-	}
+		  sdk:messages(to, from, pageSize)
+	  }
   }
 
   rule send_message {
-	select when message send
-        pre {
-            to = event:attrs{"to"}.klog("TO VALUE: ")
-	    from = event:attrs{"from"}.klog("FROM VALUE: ")
-            content = event:attrs{"content"}.klog("BODY VALUE: ")
-        }
-	every{
-        	sdk:sendMessage(to, from, content) setting(response)
-		send_directive("message sent",{"response":response})
-	}
-	fired {
-		log debug "RESPONSE: "+response
-	}
+    select when message send
+    pre {
+      to = event:attrs{"to"}.klog("TO VALUE: ")
+      from = event:attrs{"from"}.klog("FROM VALUE: ")
+      content = event:attrs{"content"}.klog("BODY VALUE: ")
+    }
+    every{
+      sdk:sendMessage(to, from, content) setting(response)
+      send_directive("message sent",{"response":response})
+    }
+    fired {
+      log debug "RESPONSE: "+response
+    }
   }
 }

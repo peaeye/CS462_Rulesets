@@ -20,9 +20,33 @@ A base ruleset for wovyn
 		from_number = 18304901337
 	}
 
+	rule new_testing_temperature {
+		select when wovyn test
+		pre {
+			temperature_value = event:attrs{"temperature_value"}.klog("TEMP VALUE: ")
+			timestamp = event:attrs{"timestamp"}.klog("TIME VALUE:")
+
+			temperature = [
+				{
+				  "name": "testing temperature",
+				  "transducerGUID": "testing transducerGUID",
+				  "units": "degrees",
+				  "temperatureF": temperature_value,
+				  "temperatureC": (temperature_value - 32)/ 180 
+				}
+			]
+			obj = {"temperature": temperature, "timestamp": timestamp}
+		}
+		send_directive("Creating new Test Temperature", obj)
+		fired {
+			raise wovyn event "new_temperature_reading"
+				attributes obj
+		}
+	}
+
 	rule process_heartbeat {
-    		select when wovyn heartbeat
-	    	pre {
+		select when wovyn heartbeat
+		pre {
 		  	thing = event:attrs{"genericThing"}.klog("GENERIC VALUE: ")
 			temperatureF = event:attrs{["genericThing", "data", "temperature"]}.klog("TempF VALUE:")
 		}	

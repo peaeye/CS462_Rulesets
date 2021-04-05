@@ -41,8 +41,8 @@ A sensor profile
 	}
 
 	rule update_profile {
-    		select when sensor profile_updated
-	    	pre {
+    	select when sensor profile_updated
+	    pre {
 			location = event:attrs{"location"}.klog("Location:") || ent:sensor_location
 			name = event:attrs{"sensor_name"}.klog("Sensor Name:") || ent:sensor_name
 			

@@ -13,6 +13,9 @@ A persistant data store for the temperature
   
    
 	global {
+		/*****************************************************
+        *  FUNCTIONS
+        */
 		temperatures = function() {
 			ent:tempsVar
 		}
@@ -25,8 +28,8 @@ A persistant data store for the temperature
 	}
 
 	rule collect_temperatures {
-    		select when wovyn new_temperature_reading
-	    	pre {
+    	select when wovyn new_temperature_reading
+	    pre {
 		  	temperature = event:attrs{"temperature"}.klog("TEMP VALUE: ")
 			timestamp = event:attrs{"timestamp"}.klog("TIME VALUE:")
 		}	
